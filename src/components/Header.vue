@@ -1,9 +1,8 @@
 <template>
-  <div class="header text-center">
-    <b-nav tabs>
+  <div class="header bg-light">
+    <b-nav tabs align="center">
       <b-nav-item disabled><b>Fancy quiz App</b></b-nav-item>
       <b-nav-item disabled>Counter : {{index}}/10</b-nav-item>
-      <b-nav-item disabled >Mohamed Nashaat</b-nav-item>
     </b-nav>
   </div>
 </template>
@@ -18,8 +17,9 @@ export default {
 </script>
 <style scoped>
   .header{
-    background-color: rgb(34, 0, 0) ;
-    margin-top: 0%;
+  
+    color: white;
+    margin-bottom: 10px
   }
 </style>
 

@@ -2,7 +2,7 @@
 <template>
   <div>
     <b-jumbotron>
-      <p slot="lead">Question : {{currentquestion["question"]}}</p>
+      <template slot="lead">Question : {{currentquestion["question"]}}</template>
       <b-list-group>
         <b-list-group-item
           v-for="(answer,index) in shuffledAnswers"
@@ -13,6 +13,16 @@
       </b-list-group>
       <b-button variant="success" v-on:click="submitAnswer" :disabled="answered ">Submit answer</b-button>
       <b-button v-on:click="myNext" variant="primary">Next</b-button>
+      <div style="margin-top:20px;" algin="left" class="text-left">
+        <p>
+          <strong>Category</strong>
+          : {{currentquestion.category}}
+        </p>
+        <p>
+          <strong>Difficulty</strong>
+          : {{currentquestion.difficulty}}
+        </p>
+      </div>
     </b-jumbotron>
   </div>
 </template>
@@ -58,8 +68,8 @@ export default {
       }
       return classes;
     },
-    countCorrectAnswers(){
-      this.$emit("correctAnswer" , true)
+    countCorrectAnswers() {
+      this.$emit("correctAnswer", true);
     },
     selectedAnswer(index) {
       this.selectedIndex = index;
@@ -80,7 +90,6 @@ export default {
       ) {
         this.answeredCorrectly = true;
         this.countCorrectAnswers();
-
       }
     }
   },
@@ -104,12 +113,12 @@ export default {
   margin: 5px;
 }
 .selected {
-  background-color: rgb(146, 175, 228);
+  background-color: #FCECC9;
 }
 .correct {
-  background-color: green;
+  background-color: #2CC860;
 }
 .incorrect {
-  background-color: red;
+  background-color: #F93943;
 }
 </style>
