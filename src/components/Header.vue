@@ -1,8 +1,8 @@
 <template>
-  <div class="header bg-light">
+  <div class="header bg-dark">
     <b-nav tabs align="center">
       <b-nav-item disabled><b>Fancy quiz App</b></b-nav-item>
-      <b-nav-item disabled>Counter : {{index}}/10</b-nav-item>
+      <b-nav-item disabled>Counter : {{Math.min(index+1,10)}}/10</b-nav-item>
     </b-nav>
   </div>
 </template>
@@ -16,9 +16,9 @@ export default {
 }
 </script>
 <style scoped>
-  .header{
+  *{
   
-    color: white;
+    color: rgb(255, 255, 255);
     margin-bottom: 10px
   }
 </style>

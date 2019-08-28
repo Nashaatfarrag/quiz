@@ -2,14 +2,15 @@
 <template>
   <div>
     <b-jumbotron>
-      <template slot="lead">Question : {{currentquestion["question"]}}</template>
+      <p slot="lead" v-html="'Question : ' + currentquestion['question']"></p>
       <b-list-group>
         <b-list-group-item
           v-for="(answer,index) in shuffledAnswers"
           :key="index"
           v-on:click="selectedAnswer(index)"
           :class="myClass(index)"
-        >{{answer}}</b-list-group-item>
+          v-html="answer"
+        ></b-list-group-item>
       </b-list-group>
       <b-button variant="success" v-on:click="submitAnswer" :disabled="answered ">Submit answer</b-button>
       <b-button v-on:click="myNext" variant="primary">Next</b-button>
@@ -89,6 +90,15 @@ export default {
         this.currentquestion.correct_answer
       ) {
         this.answeredCorrectly = true;
+        this.$swal({
+          toast : true ,
+          position : 'top',
+          showConfirmButton: false,
+          text : "correct answer",
+          type : 'success',
+          timer : 2000 
+
+        });
         this.countCorrectAnswers();
       }
     }
