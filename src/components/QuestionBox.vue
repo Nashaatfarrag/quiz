@@ -1,134 +1,112 @@
-/* eslint-disable */
 <template>
-  <div>
-    <b-jumbotron>
-      <p slot="lead" v-html="'Question : ' + currentquestion['question']"></p>
-      <b-list-group>
-        <b-list-group-item
-          v-for="(answer,index) in shuffledAnswers"
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-4" v-html="question.question"></h5>
+      
+      <div class="list-group mb-4">
+        <button
+          v-for="(answer, index) in shuffledAnswers"
           :key="index"
-          v-on:click="selectedAnswer(index)"
-          :class="myClass(index)"
+          @click="selectAnswer(index)"
+          :class="['list-group-item', 'list-group-item-action', getAnswerClass(index)]"
           v-html="answer"
-        ></b-list-group-item>
-      </b-list-group>
-      <b-button variant="success" v-on:click="submitAnswer" :disabled="answered ">Submit answer</b-button>
-      <b-button v-on:click="myNext" variant="primary">Next</b-button>
-      <div style="margin-top:20px;" algin="left" class="text-left">
-        <p>
-          <strong>Category</strong>
-          : {{currentquestion.category}}
-        </p>
-        <p>
-          <strong>Difficulty</strong>
-          : {{currentquestion.difficulty}}
-        </p>
+          :disabled="answered"
+        ></button>
       </div>
-    </b-jumbotron>
+
+      <div class="d-flex gap-2">
+        <button 
+          class="btn btn-success flex-grow-1" 
+          @click="submitAnswer"
+          :disabled="selectedIndex === null || answered"
+        >
+          تأكيد الإجابة
+        </button>
+        <button 
+          class="btn btn-primary flex-grow-1" 
+          @click="next"
+          :disabled="!answered"
+        >
+          التالي
+        </button>
+      </div>
+
+      <div class="mt-4 text-start small">
+        <p><strong>التصنيف:</strong> {{ question.category }}</p>
+        <p><strong>الصعوبة:</strong> {{ question.difficulty }}</p>
+      </div>
+    </div>
   </div>
 </template>
-<script>
-import _ from "lodash";
 
-export default {
-  props: {
-    currentquestion: Object,
-    next: Function
-  },
-  mounted() {
-    this.shuffleAnswers();
-    // console.log(this.currentquestion);
-  },
-  data() {
-    return {
-      selectedIndex: null,
-      shuffledAnswers: [],
-      answered: false,
-      answeredCorrectly: false
-    };
-  },
-  computed: {
-    answers() {
-      let answers = [...this.currentquestion.incorrect_answers];
-      answers.push(this.currentquestion.correct_answer);
-      return answers;
-    },
-    correct_idx: function() {
-      return this.shuffledAnswers.indexOf(this.currentquestion.correct_answer);
-    }
-  },
-  methods: {
-    myClass(index) {
-      let classes = "";
-      if (this.correct_idx === index && this.answered) {
-        classes = "correct";
-      } else if (this.selectedIndex === index && this.answered) {
-        classes = "incorrect";
-      } else if (this.selectedIndex === index) {
-        classes = "selected";
-      }
-      return classes;
-    },
-    countCorrectAnswers() {
-      this.$emit("correctAnswer", true);
-    },
-    selectedAnswer(index) {
-      this.selectedIndex = index;
-    },
-    shuffleAnswers() {
-      this.shuffledAnswers = _.shuffle(this.answers);
-    },
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue'
+import _ from 'lodash' // Note: lodash not in deps, we'll use native shuffle
 
-    myNext() {
-      this.answered = false;
-      this.next();
-    },
-    submitAnswer() {
-      this.answered = true;
-      if (
-        this.shuffledAnswers[this.selectedIndex] ===
-        this.currentquestion.correct_answer
-      ) {
-        this.answeredCorrectly = true;
-        this.$swal({
-          toast : true ,
-          position : 'top',
-          showConfirmButton: false,
-          text : "correct answer",
-          type : 'success',
-          timer : 2000 
+const props = defineProps({
+  question: Object
+})
 
-        });
-        this.countCorrectAnswers();
-      }
-    }
-  },
-  watch: {
-    currentquestion() {
-      (this.selectedIndex = null), this.shuffleAnswers();
-    }
+const emit = defineEmits(['next', 'correct'])
+
+const selectedIndex = ref(null)
+const answered = ref(false)
+const shuffledAnswers = ref([])
+
+// Shuffle function without lodash
+const shuffle = (array) => {
+  const newArray = [...array]
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]]
   }
-};
+  return newArray
+}
+
+const answers = computed(() => {
+  return [...props.question.incorrect_answers, props.question.correct_answer]
+})
+
+const correctIndex = computed(() => {
+  return shuffledAnswers.value.indexOf(props.question.correct_answer)
+})
+
+const getAnswerClass = (index) => {
+  if (!answered.value) return ''
+  if (index === correctIndex.value) return 'list-group-item-success'
+  if (index === selectedIndex.value) return 'list-group-item-danger'
+  return ''
+}
+
+const selectAnswer = (index) => {
+  if (!answered.value) selectedIndex.value = index
+}
+
+const submitAnswer = () => {
+  answered.value = true
+  if (selectedIndex.value === correctIndex.value) {
+    emit('correct')
+  }
+}
+
+const next = () => {
+  emit('next')
+}
+
+onMounted(() => {
+  shuffledAnswers.value = shuffle(answers.value)
+})
+
+watch(() => props.question, () => {
+  selectedIndex.value = null
+  answered.value = false
+  shuffledAnswers.value = shuffle(answers.value)
+})
 </script>
 
 <style scoped>
-.list-group {
-  margin: 5px;
-}
-.list-group-item:hover {
-  background-color: rgb(194, 194, 194);
+.list-group-item {
+  margin-bottom: 8px;
   cursor: pointer;
-}
-.btn {
-  margin: 5px;
-}
-.selected {
-  background-color: #FCECC9;
-}
-.correct {
-  background-color: #2CC860;
-}
-.incorrect {
-  background-color: #F93943;
 }
 </style>
