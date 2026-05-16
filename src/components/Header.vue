@@ -1,25 +1,17 @@
 <template>
-  <div class="header bg-dark">
-    <b-nav tabs align="center">
-      <b-nav-item disabled><b>Fancy quiz App</b></b-nav-item>
-      <b-nav-item disabled>Counter : {{Math.min(index+1,10)}}/10</b-nav-item>
-    </b-nav>
-  </div>
+  <nav class="navbar navbar-dark bg-dark py-3">
+    <div class="container">
+      <h2 class="navbar-brand mb-0">🧠 Fancy Quiz App</h2>
+      <div class="badge bg-light text-dark fs-5">
+        {{ currentIndex + 1 }} / {{ total }}
+      </div>
+    </div>
+  </nav>
 </template>
-<script>
 
-export default {
-  props : {
-    index : Number , 
-  }
-
-}
+<script setup>
+defineProps({
+  currentIndex: Number,
+  total: Number
+})
 </script>
-<style scoped>
-  *{
-  
-    color: rgb(255, 255, 255);
-    margin-bottom: 10px
-  }
-</style>
-
