@@ -41,7 +41,6 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import _ from 'lodash' // Note: lodash not in deps, we'll use native shuffle
 
 const props = defineProps({
   question: Object
