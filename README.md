@@ -1,29 +1,17 @@
-# quiz
+# Quiz App
 
-## Project setup
-```
+Modern Vue 3 + Vite Quiz Application
+
+## Setup
+
+```bash
 npm install
+npm run dev
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Features
+- Vue 3 Composition API
+- Bootstrap 5
+- OpenTDB API (10 questions)
+- RTL support
+- Score tracking

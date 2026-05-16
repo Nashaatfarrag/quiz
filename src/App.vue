@@ -1,91 +1,84 @@
 <template>
-  <div id="app">
-    <Header :index="index" />
-    <b-container class="bv-example-row">
-      <b-row align="center">
-        <b-col style="margin:auto; max-width:800px;">
-          <!-- <p>number of correct answers so far : {{answeredCorrectly}}</p> -->
-          <QuestionBox
-            v-if="questions.length && index < questions.length"
-            :currentquestion="questions[index]"
-            :next="next"
-            v-on:correctAnswer="updateCounter($event)"
-          />
-          <p class="mb-3" v-else>
-            thank you you got
-            <strong>{{answeredCorrectly}} / 10</strong>
-          </p>
-        </b-col>
-      </b-row>
-    </b-container>
-    <footer id="footer">
-      <b-container>
+  <div id="app" class="min-vh-100 bg-light">
+    <Header :current-index="currentIndex" :total="questions.length" />
     
-        <p>
-          developed by
-          <strong>Mohamed Nashaat</strong>
-        </p>
-      </b-container>
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div v-if="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status"></div>
+            <p class="mt-3">جاري تحميل الأسئلة...</p>
+          </div>
+          
+          <QuestionBox
+            v-else-if="questions.length && currentIndex < questions.length"
+            :question="questions[currentIndex]"
+            @next="nextQuestion"
+            @correct="handleCorrect"
+          />
+          
+          <div v-else class="text-center py-5">
+            <h2 class="mb-4">🎉 انتهى الاختبار!</h2>
+            <h3 class="mb-4">نتيجتك: <strong class="text-success">{{ score }} / {{ questions.length }}</strong></h3>
+            <button @click="restart" class="btn btn-primary btn-lg">ابدأ اختبار جديد</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+      <div class="container text-center">
+        <p>Developed by <strong>Mohamed Nashaat</strong> 🚀</p>
+      </div>
     </footer>
   </div>
 </template>
 
-<script>
-import Header from "./components/Header.vue";
-import QuestionBox from "./components/QuestionBox.vue";
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+<script setup>
+import { ref, onMounted } from 'vue'
+import Header from './components/Header.vue'
+import QuestionBox from './components/QuestionBox.vue'
 
+const questions = ref([])
+const currentIndex = ref(0)
+const score = ref(0)
+const loading = ref(true)
 
-export default {
-  name: "app",
-  components: {
-    Header,
-    QuestionBox,
-    FontAwesomeIcon
-  },
-  data() {
-    return {
-      questions: [],
-      index: 0,
-      answeredCorrectly: 0,
-      myIcon: faSpinner
-    };
-  },
-  methods: {
-    next() {
-      this.index++;
-    },
-    updateCounter(val) {
-      console.log(val);
-      this.answeredCorrectly++;
-    }
-  },
- 
-  mounted: function() {
-    fetch("https://opentdb.com/api.php?amount=10", {
-      method: "get"
-    })
-      .then(response => {
-        // console.log(response);
-        return response.json();
-      })
-      .then(jsonData => {
-        this.questions = jsonData.results;
-      });
+onMounted(async () => {
+  try {
+    const res = await fetch('https://opentdb.com/api.php?amount=10&type=multiple')
+    const data = await res.json()
+    questions.value = data.results
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
   }
-};
+})
+
+const nextQuestion = () => {
+  currentIndex.value++
+}
+
+const handleCorrect = () => {
+  score.value++
+}
+
+const restart = () => {
+  currentIndex.value = 0
+  score.value = 0
+  loading.value = true
+  fetch('https://opentdb.com/api.php?amount=10&type=multiple')
+    .then(res => res.json())
+    .then(data => {
+      questions.value = data.results
+      loading.value = false
+    })
+}
 </script>
 
 <style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  
-}
-#footer {
-  margin-bottom: 0%;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 </style>
